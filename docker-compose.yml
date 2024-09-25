@@ -13,6 +13,7 @@ services:
       - MYSQL_USER=root
       - MYSQL_PASSWORD=cotizaempresas
       - MYSQL_DB=cotizaciones
+      - GEMPRESA_RUN_ENV=MIDOCKER
     depends_on:
       - mongo
       - mysql  # Para asegurarse de que las bases de datos se inicien antes que la app

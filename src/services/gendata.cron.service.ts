@@ -24,6 +24,7 @@ export class GenDataService {
 
   @Cron('0 * * * * *')
   generarDatosHora() {
+    this.logger.log(process.env.NODE_ENV);
     this.generarDatosDeEmpresas();
   }
 }
