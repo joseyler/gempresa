@@ -5,8 +5,8 @@ export type IndiceDocument = HydratedDocument<Indice>;
 
 @Schema()
 export class Indice {
-    @Prop()
-    codigo: string;
+  @Prop()
+  code: string;
 
   @Prop()
   name: string;

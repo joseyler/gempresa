@@ -2,7 +2,7 @@ import { Body, Controller, Get, Post } from '@nestjs/common';
 import { IndicesService } from './indices.service';
 import { Indice } from '../indices.schema';
 
-@Controller()
+@Controller('/indices')
 export class IndicesController {
   constructor(private readonly indicesService: IndicesService) {}
 
@@ -12,7 +12,7 @@ export class IndicesController {
   }
 
   @Post()
-  async createIndice(@Body() body: { codigo: string; name: string }): Promise<Indice> {
-    return await this.indicesService.create(body.codigo,body.name);
+  async createIndice(@Body() body: { code: string; name: string }): Promise<Indice> {
+    return await this.indicesService.create(body);
   }
 }

@@ -7,8 +7,8 @@ import { Indice } from '../indices.schema';
 export class IndicesService {
   constructor(@InjectModel(Indice.name) private indiceModel: Model<Indice>) {}
 
-  async create(codigo:string, name:string): Promise<Indice> {
-    const createdIndice = new this.indiceModel(codigo, name);
+  async create(indice: Indice): Promise<Indice> {
+    const createdIndice = new this.indiceModel(indice);
     return createdIndice.save();
   }
 
