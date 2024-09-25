@@ -8,8 +8,9 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { IndicesModule } from './schemas/Indice/indices.module';
 
 @Module({
-  imports: [ScheduleModule.forRoot(), ConfigModule.forRoot({ isGlobal: true }), MongooseModule.forRoot('mongodb://mongo:27017/indices'), IndicesModule],
+  imports: [ScheduleModule.forRoot(), ConfigModule.forRoot({ isGlobal: true }), MongooseModule.forRoot(process.env.MONGO_URL), IndicesModule],
   controllers: [AppController],
   providers: [AppService, GenDataService],
 })
 export class AppModule {}
+
