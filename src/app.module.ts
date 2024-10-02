@@ -4,6 +4,8 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ScheduleModule } from '@nestjs/schedule';
 import { GenDataService } from './services/gendata.cron.service';
+import { MongooseModule } from '@nestjs/mongoose';
+import { IndicesModule } from './schemas/Indice/indices.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
@@ -21,8 +23,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       logging: 'all',
     }),
     ScheduleModule.forRoot(),
-    
-  ],
+    MongooseModule.forRoot(process.env.MONGO_URL),
+    IndicesModule,
+    ],
   controllers: [AppController],
   providers: [AppService, GenDataService],
 })
