@@ -12,7 +12,9 @@ export class IndicesController {
   }
 
   @Post()
-  async createIndice(@Body() body: { code: string; name: string }): Promise<Indice> {
+  async createIndice(
+    @Body() body: { code: string; name: string },
+  ): Promise<Indice> {
     return await this.indicesService.create(body);
   }
 }

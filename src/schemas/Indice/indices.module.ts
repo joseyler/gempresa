@@ -6,8 +6,10 @@ import { IndicesService } from './indices.service';
 import { IndicesController } from './indices.controller';
 
 @Module({
-  imports: [MongooseModule.forFeature([{ name: Indice.name, schema: IndiceSchema }])],
-  controllers:  [IndicesController],
+  imports: [
+    MongooseModule.forFeature([{ name: Indice.name, schema: IndiceSchema }]),
+  ],
+  controllers: [IndicesController],
   providers: [IndicesService],
 })
 export class IndicesModule {}

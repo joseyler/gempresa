@@ -1,3 +1,5 @@
+import DateUtils from "./DateUtils";
+
 export class StockGenerator {
   history: any[];
   currentPrice: number;
@@ -10,6 +12,7 @@ export class StockGenerator {
   }
 
   generateNextStockPrice() {
+    DateUtils.getFechaHoraActual();
     let variation = Math.random() * 2 - 1;
 
     if (Math.random() * this.stabilityFactor < 0.02) {
