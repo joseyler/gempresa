@@ -12,6 +12,10 @@ class DateUtils {
     return '';
   }
 
+  static isValidParamDate(fechaHasta: string) {
+    return fechaHasta === 'fechA';
+  }
+
   static getFechaFromRegistroFecha(fecha: RegistroFecha): Date {
     return new Date(`${fecha.fecha}T${fecha.hora}:00.000Z`);
   }
@@ -19,8 +23,6 @@ class DateUtils {
   // 2024-10-07T19:00:00.000Z
   static getRegistroFechaFromFecha(fecha: Date): RegistroFecha {
     const fechaStr = fecha.toISOString();
-    console.log(fecha);
-    console.log(fechaStr);
     return {
       fecha: fechaStr.substring(0, 10),
       hora: fechaStr.substring(11, 16),

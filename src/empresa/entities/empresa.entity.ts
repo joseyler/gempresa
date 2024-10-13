@@ -19,6 +19,20 @@ export class Empresa {
   })
   public empresaNombre: string;
 
+  @Column({
+    name: 'cotizationInicial',
+    type: 'decimal',
+    precision: 7,
+    scale: 2,
+  })
+  public cotizationInicial: number;
+
+  @Column({
+    name: 'cantidadAcciones',
+    type: 'bigint',
+  })
+  public cantidadAcciones: number;
+
   constructor(codempresa: string, empresaNombre: string) {
     this.codempresa = codempresa;
     this.empresaNombre = empresaNombre;
@@ -44,5 +58,11 @@ export class Empresa {
     this.empresaNombre = empresaNombre;
   }
 
+  public getCotizacionInicial(): number {
+    return this.cotizationInicial;
+  }
 
+  public getCantidadAcciones(): number {
+    return this.cantidadAcciones;
+  }
 }

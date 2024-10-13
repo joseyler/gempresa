@@ -7,6 +7,8 @@ import { GenDataService } from './services/gendata.cron.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { IndicesModule } from './schemas/Indice/indices.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { EmpresaModule } from './empresa/empresa.module';
+import { DevtoolsModule } from '@nestjs/devtools-integration';
 
 @Module({
   imports: [
@@ -18,14 +20,18 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       username: process.env.MYSQL_USER,
       password: process.env.MYSQL_PASSWORD,
       database: process.env.MYSQL_DB,
-      synchronize: false,
+      synchronize: true,
       entities: ['dist/**/*.entity.js'],
       logging: 'all',
+    }),
+    DevtoolsModule.register({
+      http: process.env.NODE_ENV !== 'production',
     }),
     ScheduleModule.forRoot(),
     MongooseModule.forRoot(process.env.MONGO_URL),
     IndicesModule,
-    ],
+    EmpresaModule,
+  ],
   controllers: [AppController],
   providers: [AppService, GenDataService],
 })
