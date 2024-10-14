@@ -35,9 +35,31 @@ export class EmpresaController {
     throw new HttpException(
       {
         status: HttpStatus.NOT_FOUND,
-        error: 'Error en las fechas ' + fechaDesde + ' to ' + fechaDesde,
+        error: 'Error en las fechas ' + fechaDesde + ' to ' + fechaHasta,
       },
       HttpStatus.NOT_FOUND,
     );
+  }
+
+  @Get('/:codigoEmpresa/cotizacion')
+  async getCotizacionEmpresa(
+    @Param('codigoEmpresa') codigoEmpresa: string,
+    @Query('fecha') fecha: string,
+    @Query('hora') hora: string,
+  ): Promise<any> {
+    if (DateUtils.isValidRegistroFecha({ fecha, hora })) {
+      return await this.empresaService.getCotizationFecha(codigoEmpresa, {
+        fecha,
+        hora,
+      });
+    } else {
+      throw new HttpException(
+        {
+          status: HttpStatus.BAD_REQUEST,
+          error: 'Error ',
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 }

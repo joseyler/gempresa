@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { FindOptionsWhere, Repository } from 'typeorm';
 import { Empresa } from './entities/empresa.entity';
 import { Cotizacion } from './entities/cotizacion.entity';
+import { RegistroFecha } from 'src/model/registro.fecha';
 
 @Injectable()
 export class EmpresaService {
@@ -55,7 +56,7 @@ export class EmpresaService {
 
   async getLast20CotizacionEmpresa(empresaId: number) {
     try {
-      const sql = `select * from cotizaciones where idEmpresa = ${empresaId} order by dateUTC desc limit 1`;
+      const sql = `select * from cotizaciones where idEmpresa = ${empresaId} order by dateUTC desc, hora desc limit 20`;
       const response = await this.cotizacionRepository.query(sql);
       return response;
     } catch (error) {
@@ -66,5 +67,37 @@ export class EmpresaService {
 
   async saveCotizacion(newCot: Cotizacion): Promise<Cotizacion> {
     return await this.cotizacionRepository.save(newCot);
+  }
+
+  async getCotizationFecha(
+    codigoEmpresa: string,
+    regFecha: RegistroFecha,
+  ): Promise<Cotizacion> {
+    const criterio: FindOptionsWhere<Cotizacion> = {
+      empresa: {
+        codempresa: codigoEmpresa,
+      },
+      fecha: regFecha.fecha,
+      hora: regFecha.hora,
+    };
+    const cotizacion: Cotizacion =
+      await this.cotizacionRepository.findOneBy(criterio);
+
+    if (cotizacion) {
+      return cotizacion;
+    }
+    throw new HttpException(
+      {
+        status: HttpStatus.NOT_FOUND,
+        error:
+          'No se encuentra cotizacion para ' +
+          codigoEmpresa +
+          ' ' +
+          regFecha.fecha +
+          ' ' +
+          regFecha.hora,
+      },
+      HttpStatus.NOT_FOUND,
+    );
   }
 }

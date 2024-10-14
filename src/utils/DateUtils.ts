@@ -12,8 +12,15 @@ class DateUtils {
     return '';
   }
 
-  static isValidParamDate(fechaHasta: string) {
-    return fechaHasta === 'fechA';
+  static isValidParamDate(fecha: string): boolean {
+    return /^\d{4}-[01]\d-[0-3]\dT([01]\d|2[0-3]):[0-5]\d$/.test(fecha);
+  }
+
+  static isValidRegistroFecha(rf: RegistroFecha): boolean {
+    return (
+      /^\d{4}-\d{2}-\d{2}$/.test(rf.fecha) &&
+      /^([01]\d|2[0-3]):[0-5]\d$/.test(rf.hora)
+    );
   }
 
   static getFechaFromRegistroFecha(fecha: RegistroFecha): Date {

@@ -18,28 +18,28 @@ export class GenDataService {
 
   async generarDatosDeEmpresas() {
     const empresas = await this.empresaService.getAllEmpresas();
-    empresas.filter((val, index) => index < 1).forEach(async (emp: Empresa) => {
+    empresas/*.filter((val, index) => index < 20)*/.forEach(async (emp: Empresa) => {
       this.logger.log("Running update values for " + emp.getEmpresaNombre());
       const cotizaciones: Cotizacion[] = await  this.empresaService.getLast20CotizacionEmpresa(emp.getId());
       if (cotizaciones.length === 0) {
         cotizaciones.push({
           cotization: Number(emp.cotizationInicial),
-          dateUTC: '2024-09-30T23:00:00.000Z',
-          fecha: '2024-09-30',
+          dateUTC: '2023-12-31T23:00:00.000Z',
+          fecha: '2023-12-31',
           hora: '23:00',
           empresa: emp,
           id: 0
         });
       }
       //ultima cotizacion
-      this.logger.log(JSON.stringify(cotizaciones));
-      const uptimaCotizacion = cotizaciones[cotizaciones.length - 1];
+      const uptimaCotizacion = cotizaciones[0];
       const faltantes = DateUtils.getRegistrosEntreFechas({
         fecha: uptimaCotizacion.fecha,
         hora: uptimaCotizacion.hora
       }, 
       DateUtils.getRegistroFechaFromFecha(new Date()),
     );
+
     for (let indexFaltantes = 1; indexFaltantes < faltantes.length; indexFaltantes++) {
       const rc: RegistroCotizacion = faltantes[indexFaltantes];
 
@@ -57,7 +57,6 @@ export class GenDataService {
         dateUTC: `${rc.fecha}T${rc.hora}`,
         id: null, 
       };
-      this.logger.log(JSON.stringify(rc));
       await this.empresaService.saveCotizacion(newCot);
       cotizaciones.push(newCot);
       if (cotizaciones.length > 20) {
@@ -68,9 +67,8 @@ export class GenDataService {
     });
   }
 
-  @Cron('0 * * * * *')
+  @Cron('0 */10 * * * *')
   generarDatosHora() {
-    this.logger.log(process.env.NODE_ENV);
     this.generarDatosDeEmpresas();
   }
 }
