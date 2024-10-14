@@ -30,7 +30,11 @@ export class EmpresaController {
       DateUtils.isValidParamDate(fechaDesde) &&
       DateUtils.isValidParamDate(fechaHasta)
     ) {
-      return await this.empresaService.getDetalleEmpresa(codigoEmpresa);
+      return await this.empresaService.getCotizationesbyFechas(
+        codigoEmpresa,
+        fechaDesde,
+        fechaHasta,
+      );
     }
     throw new HttpException(
       {

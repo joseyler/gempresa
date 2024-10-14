@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindOptionsWhere, Repository } from 'typeorm';
+import { Between, FindOptionsWhere, Repository } from 'typeorm';
 import { Empresa } from './entities/empresa.entity';
 import { Cotizacion } from './entities/cotizacion.entity';
 import { RegistroFecha } from 'src/model/registro.fecha';
@@ -99,5 +99,37 @@ export class EmpresaService {
       },
       HttpStatus.NOT_FOUND,
     );
+  }
+
+  async getCotizationesbyFechas(
+    codigoEmpresa: string,
+    fechaDesde: string,
+    fechaHasta: string,
+  ): Promise<Cotizacion[]> {
+    const fechaDesdeArray = fechaDesde.split('T');
+    const fechaHastaArray = fechaHasta.split('T');
+    const criterio: FindOptionsWhere<Cotizacion> = {
+      empresa: {
+        codempresa: codigoEmpresa,
+      },
+      dateUTC: Between(fechaDesdeArray[0], fechaHastaArray[0]),
+    };
+    const cotizaciones: Cotizacion[] =
+      await this.cotizacionRepository.findBy(criterio);
+    return cotizaciones.filter((cot) => {
+      let validoDesde = true;
+      let validoHasta = true;
+      if (cot.fecha == fechaDesdeArray[0]) {
+        if (cot.hora < fechaDesdeArray[1]) {
+          validoDesde = false;
+        }
+      }
+      if (cot.fecha == fechaHastaArray[0]) {
+        if (cot.hora > fechaHastaArray[1]) {
+          validoHasta = false;
+        }
+      }
+      return validoDesde && validoHasta;
+    });
   }
 }
