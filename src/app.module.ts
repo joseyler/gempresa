@@ -4,7 +4,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ScheduleModule } from '@nestjs/schedule';
 import { GenDataService } from './services/gendata.cron.service';
-import { MongooseModule } from '@nestjs/mongoose';
+// import { MongooseModule } from '@nestjs/mongoose';
 import { IndicesModule } from './schemas/Indice/indices.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { EmpresaModule } from './empresa/empresa.module';
@@ -28,7 +28,7 @@ import { DevtoolsModule } from '@nestjs/devtools-integration';
       http: process.env.NODE_ENV !== 'production',
     }),
     ScheduleModule.forRoot(),
-    MongooseModule.forRoot(process.env.MONGO_URL),
+    // MongooseModule.forRoot(process.env.MONGO_URL),
     IndicesModule,
     EmpresaModule,
   ],
