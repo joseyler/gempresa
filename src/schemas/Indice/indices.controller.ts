@@ -12,12 +12,17 @@ import { IndicesService } from './indices.service';
 import { Indice } from '../indices.schema';
 import { IndiceCotizacion } from 'src/model/indice.cotizacion';
 import DateUtils from 'src/utils/DateUtils';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Indices Bursatiles')
 @Controller('/indices')
 export class IndicesController {
   constructor(private readonly indicesService: IndicesService) {}
 
   @Get()
+  @ApiOperation({
+    summary: 'Obtener los indices bursatiles registrados',
+  })
   async getIndices(): Promise<Indice[]> {
     return await this.indicesService.findAll();
   }
