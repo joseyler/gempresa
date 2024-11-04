@@ -49,8 +49,7 @@ export class IndicesService {
     const collections = await this.connection.listCollections();
     const collect = collections.find((co) => co.name === schemaName);
     if (collect) {
-      const schemaNew = new Schema(IndiceValor);
-      const model = this.connection.model(schemaName, schemaNew);
+      const model = await this.getOrCreateSchema(schemaName);
       const existente = await model
         .findOne({ fecha: cotizacion.fecha, hora: cotizacion.hora })
         .exec();
