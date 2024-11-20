@@ -49,6 +49,7 @@ export class IndicesService {
         fechaDate: cotizacion.fecha,
         hora: cotizacion.hora,
         valor: cotizacion.valorIndice,
+        code: cotizacion.codigoIndice,
       });
       await rec.save();
       return true;
