@@ -73,6 +73,7 @@ export class IndicesService {
 
     const values = await this.indiceValorModel.find({
       fechaDate: { $gte: fechaDesde, $lte: fechaHasta },
+      code: codigoIndice,
     });
 
     return values.filter((cot) => {
