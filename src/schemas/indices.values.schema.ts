@@ -1,10 +1,3 @@
-const IndiceValor = {
-  valor: { type: Number, required: true },
-  fecha: { type: String, required: true },
-  hora: { type: String, required: true },
-  fechaDate: { type: Date, required: true },
-};
-
 export interface IndiceValorInterface {
   valor: number;
   fecha: string;
@@ -12,4 +5,27 @@ export interface IndiceValorInterface {
   fechaDate: string;
 }
 
-export default IndiceValor;
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { HydratedDocument } from 'mongoose';
+
+export type IndiceValorDocument = HydratedDocument<IndiceValor>;
+
+@Schema()
+export class IndiceValor {
+  @Prop()
+  code: string;
+
+  @Prop()
+  fecha: string;
+
+  @Prop()
+  hora: string;
+
+  @Prop()
+  fechaDate: Date;
+
+  @Prop()
+  valor: number;
+}
+
+export const IndiceValorSchema = SchemaFactory.createForClass(IndiceValor);

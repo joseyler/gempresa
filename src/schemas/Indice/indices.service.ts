@@ -1,15 +1,16 @@
-import { Model, Connection, Schema } from 'mongoose';
+import { Model } from 'mongoose';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { InjectModel, InjectConnection } from '@nestjs/mongoose';
+import { InjectModel } from '@nestjs/mongoose';
 import { IndiceCotizacion } from 'src/model/indice.cotizacion';
 import { Indice } from '../indices.schema';
-import IndiceValor, { IndiceValorInterface } from '../indices.values.schema';
+import { IndiceValor } from '../indices.values.schema';
 
 @Injectable()
 export class IndicesService {
   constructor(
     @InjectModel(Indice.name) private indiceModel: Model<Indice>,
-    @InjectConnection() private readonly connection: Connection,
+    @InjectModel(IndiceValor.name)
+    private readonly indiceValorModel: Model<IndiceValor>,
   ) {}
 
   async create(indice: Indice): Promise<Indice> {
@@ -18,7 +19,6 @@ export class IndicesService {
       .exec();
     if (!existente) {
       const createdIndice = new this.indiceModel(indice);
-      await this.getOrCreateSchema(`indice${indice.code}`);
       return createdIndice.save();
     }
     console.log(existente);
@@ -35,48 +35,30 @@ export class IndicesService {
     return this.indiceModel.find().exec();
   }
 
-  async getOrCreateSchema(schemaName: string): Promise<Model<any>> {
-    if (this.connection.models[schemaName]) {
-      return this.connection.models[schemaName];
-    }
-    const schemaNew = new Schema(IndiceValor);
-    const model = this.connection.model(schemaName, schemaNew);
-    return model;
-  }
-
   async createCotizacion(cotizacion: IndiceCotizacion): Promise<boolean> {
-    const schemaName = `indice${cotizacion.codigoIndice.toLowerCase()}es`;
-    const collections = await this.connection.listCollections();
-    const collect = collections.find((co) => co.name === schemaName);
-    if (collect) {
-      const model = await this.getOrCreateSchema(schemaName);
-      const existente = await model
-        .findOne({ fecha: cotizacion.fecha, hora: cotizacion.hora })
-        .exec();
-      if (!existente) {
-        const rec: IndiceValorInterface = {
-          fecha: cotizacion.fecha,
-          fechaDate: cotizacion.fecha,
-          hora: cotizacion.hora,
-          valor: cotizacion.valorIndice,
-        };
-        await model.create(rec);
-        return true;
-      }
-      throw new HttpException(
-        {
-          status: HttpStatus.CONFLICT,
-          error: 'ya existe valor indice',
-        },
-        HttpStatus.CONFLICT,
-      );
+    const existente = await this.indiceValorModel
+      .findOne({
+        fecha: cotizacion.fecha,
+        hora: cotizacion.hora,
+        code: cotizacion.codigoIndice,
+      })
+      .exec();
+    if (!existente) {
+      const rec = new this.indiceValorModel({
+        fecha: cotizacion.fecha,
+        fechaDate: cotizacion.fecha,
+        hora: cotizacion.hora,
+        valor: cotizacion.valorIndice,
+      });
+      await rec.save();
+      return true;
     }
     throw new HttpException(
       {
-        status: HttpStatus.NOT_FOUND,
-        error: 'No Existe indice',
+        status: HttpStatus.CONFLICT,
+        error: 'ya existe valor indice',
       },
-      HttpStatus.NOT_FOUND,
+      HttpStatus.CONFLICT,
     );
   }
 
@@ -87,38 +69,25 @@ export class IndicesService {
   ): Promise<any> {
     const fechaDesdeArray = fechaDesde.split('T');
     const fechaHastaArray = fechaHasta.split('T');
-    const schemaName = `indice${codigoIndice.toLowerCase()}es`;
-    const collections = await this.connection.listCollections();
-    const collect = collections.find((co) => co.name === schemaName);
-    if (collect) {
-      const model = await this.getOrCreateSchema(schemaName);
-      const values = await model
-        .find({
-          fechaDate: { $gte: fechaDesde, $lte: fechaHasta },
-        })
-        .exec();
-      return values.filter((cot) => {
-        let validoDesde = true;
-        let validoHasta = true;
-        if (cot.fecha == fechaDesdeArray[0]) {
-          if (cot.hora < fechaDesdeArray[1]) {
-            validoDesde = false;
-          }
+
+    const values = await this.indiceValorModel.find({
+      fechaDate: { $gte: fechaDesde, $lte: fechaHasta },
+    });
+
+    return values.filter((cot) => {
+      let validoDesde = true;
+      let validoHasta = true;
+      if (cot.fecha == fechaDesdeArray[0]) {
+        if (cot.hora < fechaDesdeArray[1]) {
+          validoDesde = false;
         }
-        if (cot.fecha == fechaHastaArray[0]) {
-          if (cot.hora > fechaHastaArray[1]) {
-            validoHasta = false;
-          }
+      }
+      if (cot.fecha == fechaHastaArray[0]) {
+        if (cot.hora > fechaHastaArray[1]) {
+          validoHasta = false;
         }
-        return validoDesde && validoHasta;
-      });
-    }
-    throw new HttpException(
-      {
-        status: HttpStatus.NOT_FOUND,
-        error: 'No Existe indice',
-      },
-      HttpStatus.NOT_FOUND,
-    );
+      }
+      return validoDesde && validoHasta;
+    });
   }
 }
