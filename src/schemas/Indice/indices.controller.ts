@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpException,
   HttpStatus,
@@ -65,5 +66,30 @@ export class IndicesController {
     @Body() body: { code: string; name: string },
   ): Promise<Indice> {
     return await this.indicesService.create(body);
+  }
+
+  @Delete('/:codigoIndice/cotizaciones/')
+  async deleteCotizaciones(
+    @Param('codigoIndice') codigoIndice: string,
+    @Query('fechaDesde') fechaDesde: string,
+    @Query('fechaHasta') fechaHasta: string,
+  ): Promise<any> {
+    if (
+      DateUtils.isValidParamDate(fechaDesde) &&
+      DateUtils.isValidParamDate(fechaHasta)
+    ) {
+      return await this.indicesService.eliminarCotizationesbyFechas(
+        codigoIndice,
+        fechaDesde,
+        fechaHasta,
+      );
+    }
+    throw new HttpException(
+      {
+        status: HttpStatus.NOT_FOUND,
+        error: 'Error en las fechas ' + fechaDesde + ' to ' + fechaHasta,
+      },
+      HttpStatus.NOT_FOUND,
+    );
   }
 }

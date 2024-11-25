@@ -72,11 +72,14 @@ export class IndicesService {
     const fechaHastaArray = fechaHasta.split('T');
 
     const values = await this.indiceValorModel.find({
-      fechaDate: { $gte: fechaDesde, $lte: fechaHasta },
+      fechaDate: {
+        $gte: `${fechaDesdeArray[0]}T00:00:00.000Z`,
+        $lte: `${fechaHastaArray[0]}T00:00:00.000Z`,
+      },
       code: codigoIndice,
     });
 
-    return values.filter((cot) => {
+    const filtradosHora = values.filter((cot) => {
       let validoDesde = true;
       let validoHasta = true;
       if (cot.fecha == fechaDesdeArray[0]) {
@@ -91,5 +94,48 @@ export class IndicesService {
       }
       return validoDesde && validoHasta;
     });
+    filtradosHora.sort((cot1, cot2) => {
+      if (cot1.fecha == cot2.fecha) {
+        return cot1.hora < cot2.hora ? -1 : 1;
+      } else {
+        return cot1.fecha < cot2.fecha ? -1 : 1;
+      }
+    });
+    return filtradosHora;
+  }
+
+  async eliminarCotizationesbyFechas(
+    codigoIndice: string,
+    fechaDesde: string,
+    fechaHasta: string,
+  ): Promise<any> {
+    const aborrar = await this.getCotizationesbyFechas(
+      codigoIndice,
+      fechaDesde,
+      fechaHasta,
+    );
+
+    const promesas = aborrar.map(async (cot): Promise<number> => {
+      const respuesta = await this.indiceValorModel.deleteOne({ _id: cot._id });
+      return respuesta.deletedCount;
+    });
+    const resultados = await Promise.all(promesas);
+    const conErrores = resultados.filter(
+      (cantidadBorrados) => cantidadBorrados != 1,
+    );
+    if (conErrores.length > 0) {
+      throw new Error('Error eliminando registro');
+    }
+    return {
+      eliminados: resultados.length,
+    };
+    // alternativa 2 (old school)
+    // for (let index = 0; index < aborrar.length; index++) {
+    //   const cot = aborrar[index];
+    //   const respuesta = await this.indiceValorModel.deleteOne({ _id: cot._id });
+    //   if (respuesta.deletedCount != 1) {
+    //     throw new Error('Error eliminando registro');
+    //   }
+    // }
   }
 }
